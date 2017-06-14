@@ -9,7 +9,8 @@ defmodule Invoice.Mixfile do
     {:postgrex, "~> 0.13.2"},
     {:ecto, "~> 2.1"},
     {:poison, "~> 3.1.0"},
-    {:ex_doc, ">= 0.0.0", only: :dev}
+    {:ex_doc, ">= 0.0.0", only: :dev},
+    {:changeset_merger, "~> 0.3.8"}
   ]
 
   @aliases [

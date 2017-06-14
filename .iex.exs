@@ -1,1 +1,1 @@
-alias Invoice.{Action,Repo}
+alias Invoice.{Bill, Action,Repo}
