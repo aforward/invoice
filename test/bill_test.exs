@@ -44,6 +44,13 @@ defmodule Invoice.BillTest do
     assert %{"tax" => 0.15} == bill.data
   end
 
+  test "find_or_create" do
+    original_bill = Bill.find_or_create(1, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    same_bill = Bill.find_or_create(2, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    assert original_bill.identifier == same_bill.identifier
+    assert 100 == same_bill.amount
+  end
+
   test "update" do
     bill = Bill.create(12.50, 3, %{description: "10 bunnies"})
 
@@ -53,4 +60,16 @@ defmodule Invoice.BillTest do
 
     assert ["bill_created", "bill_updated"] == Action.summary("Bill", bill.identifier)
   end
+
+  test "find" do
+    bill = Bill.find("A", "123", "10 bunnies")
+    assert bill == nil
+
+    original_bill = Bill.create(1, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    bill = Bill.find("A", "123", "10 bunnies")
+
+    assert original_bill.identifier == bill.identifier
+  end
+
+
 end

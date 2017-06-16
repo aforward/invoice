@@ -1,7 +1,10 @@
 defmodule Invoice.Bill do
   use Ecto.Schema
+  use FnExpr
   import Ecto.Changeset
+  import Ecto.Query, only: [from: 2]
   import ChangesetMerger, only: [derive_if_missing: 4, defaulted: 3]
+
 
   alias Invoice.{Bill, Action, Repo}
   alias ChangesetMerger.Token
@@ -32,11 +35,14 @@ defmodule Invoice.Bill do
     |> defaulted(:payment_status, "created")
     |> validate_required([:description])
   end
+  def changeset(amount, precision, params) do
+    %Bill{}
+    |> changeset(Map.merge(amount_to_db(amount, precision), params))
+  end
 
   def create(amount, params), do: create(amount, @default_precision, params)
   def create(amount, precision, params) do
-    %Bill{}
-    |> changeset(Map.merge(amount_to_db(amount, precision), params))
+    changeset(amount, precision, params)
     |> Repo.insert!
     |> add_action("bill_created")
   end
@@ -46,6 +52,20 @@ defmodule Invoice.Bill do
     |> changeset(params)
     |> Repo.update!
     |> add_action("bill_updated")
+  end
+
+  def find_or_create(amount, params), do: find_or_create(amount, @default_precision, params)
+  def find_or_create(amount, precision, params) do
+    changeset(amount, precision, params)
+    |> invoke(&1.changes)
+    |> invoke(find(&1[:entity_type], &1[:entity_id], &1[:description]))
+    |> invoke(fn (b) -> if is_nil(b), do: create(amount, precision, params), else: b end)
+  end
+
+  def find(type, id, description) do
+    query = from t in Bill,
+      where: t.entity_type == ^type and t.entity_id == ^id and t.description == ^description
+    query |> Repo.one
   end
 
   @doc"""
@@ -83,7 +103,7 @@ defmodule Invoice.Bill do
   def amount_to_db(amount, precision) when is_binary(amount) do
     amount
     |> Float.parse
-    |> (fn{num, _} -> num end).()
+    |> invoke(fn{num, _} -> num end)
     |> amount_to_db(precision)
   end
   def amount_to_db(amount, precision) do

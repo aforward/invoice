@@ -9,6 +9,7 @@ defmodule Invoice.Mixfile do
     {:postgrex, "~> 0.13.2"},
     {:ecto, "~> 2.1"},
     {:poison, "~> 3.1.0"},
+    {:fn_expr, "~> 0.1.0"},
     {:ex_doc, ">= 0.0.0", only: :dev},
     {:changeset_merger, "~> 0.3.8"}
   ]
@@ -25,7 +26,7 @@ defmodule Invoice.Mixfile do
     [
       app:     @name,
       version: @version,
-      elixir:  ">= 1.4.2",
+      elixir:  "~> 1.4",
       deps:    @deps,
       aliases: @aliases,
       build_embedded:  in_production,
