@@ -11,7 +11,7 @@ defmodule Invoice.Mixfile do
     {:poison, "~> 3.1.0"},
     {:fn_expr, "~> 0.1.0"},
     {:ex_doc, ">= 0.0.0", only: :dev},
-    {:changeset_merger, "~> 0.3.8"}
+    {:changeset_merger, "~> 0.3.9"}
   ]
 
   @aliases [
