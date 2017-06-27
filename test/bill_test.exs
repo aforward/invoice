@@ -61,7 +61,7 @@ defmodule Invoice.BillTest do
     assert ["bill_created", "bill_updated"] == Action.summary("Bill", bill.identifier)
   end
 
-  test "find" do
+  test "find (entity)" do
     bill = Bill.find("A", "123", "10 bunnies")
     assert bill == nil
 
@@ -71,5 +71,15 @@ defmodule Invoice.BillTest do
     assert original_bill.identifier == bill.identifier
   end
 
+  test "find (identifier)" do
+    bill = Bill.find("abc123")
+    assert bill == nil
+
+    original_bill = Bill.create(1, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    bill = Bill.find(original_bill.identifier)
+
+    assert original_bill.identifier == bill.identifier
+    assert original_bill.description == bill.description
+  end
 
 end

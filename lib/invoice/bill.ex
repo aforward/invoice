@@ -67,6 +67,11 @@ defmodule Invoice.Bill do
       where: t.entity_type == ^type and t.entity_id == ^id and t.description == ^description
     query |> Repo.one
   end
+  def find(identifier) do
+    query = from t in Bill,
+      where: t.identifier == ^identifier
+    query |> Repo.one
+  end
 
   @doc"""
   Prepare an amount for the database.  If it's an integer, nothing
