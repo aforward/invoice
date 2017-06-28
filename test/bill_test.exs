@@ -82,4 +82,8 @@ defmodule Invoice.BillTest do
     assert original_bill.description == bill.description
   end
 
+  test "to_stripe_invoice" do
+    assert Bill.to_map(%Invoice.Bill{amount: 10}) ==   %{"amount" => 10}
+  end
+
 end

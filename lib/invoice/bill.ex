@@ -9,11 +9,9 @@ defmodule Invoice.Bill do
   alias Invoice.{Bill, Action, Repo}
   alias ChangesetMerger.Token
 
-  @fields [:identifier, :name, :description, :entity_type, :entity_id,
-           :amount, :precision, :currency, :payment_status, :data]
   @default_precision 2
 
-  @derive {Poison.Encoder, only: @fields}
+  @derive {Poison.Encoder, except: [:__meta__]}
   schema "bills" do
     field :identifier, :string
     field :name, :string
@@ -116,6 +114,23 @@ defmodule Invoice.Bill do
   end
   def amount_to_db(amount, precision) do
     %{amount: floor(amount * :math.pow(10, precision)), precision: precision}
+  end
+
+  @doc"""
+  Convert to a simple map where the keys are strings
+
+  ## Examples
+
+      iex> Invoice.Bill.to_map(%Invoice.Bill{amount: 2000, precision: 2, currency: "usd"})
+      %{"amount" => 2000, "precision" => 2, "currency" => "usd"}
+
+  """
+  def to_map(bill) do
+    bill
+    |> Map.drop([:__meta__, :__struct__])
+    |> Enum.filter(fn {_, v} -> v end)
+    |> Enum.map(fn {k, v} -> {"#{k}", v} end)
+    |> Enum.into(%{})
   end
 
   @doc"""
