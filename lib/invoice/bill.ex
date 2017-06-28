@@ -120,6 +120,12 @@ defmodule Invoice.Bill do
 
   ## Examples
 
+      iex> Invoice.Bill.amount_to_ui(%{amount: 2000, precision: 2, currency: "usd"})
+      "$20.00 USD"
+
+      iex> Invoice.Bill.amount_to_ui(%{amount: 2000, precision: 2, currency: "cad"})
+      "$20.00 CAD"
+
       iex> Invoice.Bill.amount_to_ui(%{amount: 2000, precision: 2})
       "20.00"
 
@@ -136,9 +142,15 @@ defmodule Invoice.Bill do
       "12.3459"
 
   """
-  def amount_to_ui(%{amount: amount, precision: precision}) do
+  def amount_to_ui(%{amount: amount, precision: precision} = bill) do
     amount * :math.pow(10, -precision)
     |> :erlang.float_to_binary([decimals: precision])
+    |> invoke(fn raw ->
+                case Map.get(bill, :currency) do
+                  nil -> raw
+                  curr -> "$#{raw} #{curr |> String.upcase}"
+                end
+              end)
   end
 
   defp floor(i) when is_integer(i), do: i
