@@ -9,8 +9,11 @@ defmodule Invoice.Bill do
   alias Invoice.{Bill, Action, Repo}
   alias ChangesetMerger.Token
 
+  @fields [:identifier, :name, :description, :entity_type, :entity_id,
+           :amount, :precision, :currency, :payment_status, :data]
   @default_precision 2
 
+  @derive {Poison.Encoder, only: @fields}
   schema "bills" do
     field :identifier, :string
     field :name, :string
