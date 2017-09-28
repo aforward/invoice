@@ -82,8 +82,12 @@ defmodule Invoice.BillTest do
     assert original_bill.description == bill.description
   end
 
-  test "to_stripe_invoice" do
+  test "to_stripe_invoice (no additional args)" do
     assert Bill.to_map(%Invoice.Bill{amount: 10}) ==   %{"amount" => 10}
+  end
+
+  test "to_stripe_invoice (additional args" do
+    assert Bill.to_map(%Invoice.Bill{amount: 10}, %{capture: false}) == %{"amount" => 10, "capture" => false}
   end
 
 end

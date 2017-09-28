@@ -124,11 +124,16 @@ defmodule Invoice.Bill do
       iex> Invoice.Bill.to_map(%Invoice.Bill{amount: 2000, precision: 2, currency: "usd"})
       %{"amount" => 2000, "precision" => 2, "currency" => "usd"}
 
+
+      iex> Invoice.Bill.to_map(%Invoice.Bill{amount: 2000, precision: 2, currency: "usd"}, %{capture: false})
+      %{"amount" => 2000, "precision" => 2, "currency" => "usd", "capture" => false}
+
   """
-  def to_map(bill) do
+  def to_map(bill, additional_fields \\ %{}) do
     bill
     |> Map.drop([:__meta__, :__struct__])
-    |> Enum.filter(fn {_, v} -> v end)
+    |> Map.merge(additional_fields)
+    |> Enum.filter(fn {_, v} -> v !== nil end)
     |> Enum.map(fn {k, v} -> {"#{k}", v} end)
     |> Enum.into(%{})
   end
