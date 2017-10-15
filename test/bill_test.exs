@@ -45,17 +45,25 @@ defmodule Invoice.BillTest do
   end
 
   test "find_or_create" do
-    original_bill = Bill.find_or_create(1, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
-    same_bill = Bill.find_or_create(2, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    original_bill = Bill.find_or_create(1, %{name: "10 bunnies", description: "x", entity_type: "A", entity_id: "123"})
+    assert 100 == original_bill.amount
+    assert "x" == original_bill.description
+
+    same_bill = Bill.find_or_create(2, %{name: "10 bunnies", description: "y", entity_type: "A", entity_id: "123"})
     assert original_bill.identifier == same_bill.identifier
     assert 100 == same_bill.amount
+    assert "x" == same_bill.description
   end
 
   test "upsert" do
-    original_bill = Bill.upsert(1, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
-    same_bill = Bill.upsert(2, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    original_bill = Bill.upsert(1, %{name: "Bunny Purchase", description: "8 bunnies", entity_type: "A", entity_id: "123"})
+    assert 100 == original_bill.amount
+    assert "8 bunnies" == original_bill.description
+
+    same_bill = Bill.upsert(2, %{name: "Bunny Purchase", description: "9 bunnies", entity_type: "A", entity_id: "123"})
     assert original_bill.identifier == same_bill.identifier
     assert 200 == same_bill.amount
+    assert "9 bunnies" == same_bill.description
   end
 
   test "update" do

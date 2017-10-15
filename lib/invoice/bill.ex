@@ -64,7 +64,7 @@ defmodule Invoice.Bill do
   def find_or_create(amount, precision, params) do
     changeset(amount, precision, params)
     |> invoke(&1.changes)
-    |> invoke(find(&1[:entity_type], &1[:entity_id], &1[:description]))
+    |> invoke(find(&1[:entity_type], &1[:entity_id], &1[:name]))
     |> invoke(fn (b) -> if is_nil(b), do: create(amount, precision, params), else: b end)
   end
 
@@ -72,16 +72,16 @@ defmodule Invoice.Bill do
   def upsert(amount, precision, params) do
     changeset(amount, precision, params)
     |> invoke(&1.changes)
-    |> invoke(find(&1[:entity_type], &1[:entity_id], &1[:description]))
+    |> invoke(find(&1[:entity_type], &1[:entity_id], &1[:name]))
     |> invoke(fn
           nil -> create(amount, precision, params)
           b -> b |> update(amount, precision, params)
        end)
   end
 
-  def find(type, id, description) do
+  def find(type, id, name) do
     query = from t in Bill,
-      where: t.entity_type == ^type and t.entity_id == ^id and t.description == ^description
+      where: t.entity_type == ^type and t.entity_id == ^id and t.name == ^name
     query |> Repo.one
   end
   def find(identifier) do
