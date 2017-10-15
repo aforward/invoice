@@ -54,6 +54,11 @@ defmodule Invoice.Bill do
     |> Repo.update!
     |> add_action("bill_updated")
   end
+  def update(bill, amount, precision, params) do
+    params
+    |> Map.merge(amount_to_db(amount, precision))
+    |> invoke(update(bill, &1))
+  end
 
   def find_or_create(amount, params), do: find_or_create(amount, @default_precision, params)
   def find_or_create(amount, precision, params) do
@@ -61,6 +66,17 @@ defmodule Invoice.Bill do
     |> invoke(&1.changes)
     |> invoke(find(&1[:entity_type], &1[:entity_id], &1[:description]))
     |> invoke(fn (b) -> if is_nil(b), do: create(amount, precision, params), else: b end)
+  end
+
+  def upsert(amount, params), do: upsert(amount, @default_precision, params)
+  def upsert(amount, precision, params) do
+    changeset(amount, precision, params)
+    |> invoke(&1.changes)
+    |> invoke(find(&1[:entity_type], &1[:entity_id], &1[:description]))
+    |> invoke(fn
+          nil -> create(amount, precision, params)
+          b -> b |> update(amount, precision, params)
+       end)
   end
 
   def find(type, id, description) do

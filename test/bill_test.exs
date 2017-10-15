@@ -51,6 +51,13 @@ defmodule Invoice.BillTest do
     assert 100 == same_bill.amount
   end
 
+  test "upsert" do
+    original_bill = Bill.upsert(1, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    same_bill = Bill.upsert(2, %{description: "10 bunnies", entity_type: "A", entity_id: "123"})
+    assert original_bill.identifier == same_bill.identifier
+    assert 200 == same_bill.amount
+  end
+
   test "update" do
     bill = Bill.create(12.50, 3, %{description: "10 bunnies"})
 
